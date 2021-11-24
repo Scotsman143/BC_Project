@@ -1,19 +1,19 @@
+##########################################################################################
+#Author: Luke Ashton
+#Github_Tag: Scotsman143
+#Date: November 23, 2021
+#Last_Updated: November 24, 2021
+#Github_Repo: https://github.com/Scotsman143/BC_Project
+##########################################################################################
 library(plyr)
 library(reshape2)
 library(ggplot2)
-#library(Synth)
-#library(gsynth)
-#library(panelView)
 library(glmnet)
-#library(quadprog)
-
 
 ##########################################################################################
 # Set working directory and import data
 ##########################################################################################
-
-# set working directory
-datadir <- "C:/Users/lukea/Desktop/GMU/Fall 2021/Economics of Regulation/Term Paper/data/use_data"
+datadir <- "C:/Users/lukea/Documents/GitHub/BC_Project/Term Paper/data/use_data"
 setwd(datadir)
 
 ##########################################################################################
@@ -21,7 +21,7 @@ setwd(datadir)
 ##########################################################################################
 
 # bring in unemployment data
-Unemploy.Data <- read.csv("new_unemploy.csv", stringsAsFactors=F)
+Unemploy.Data <- read.csv("unemploy.csv", stringsAsFactors=F)
 
 # create province name variable for 10 provinces and 3 territories (59 is BC)
 Unemploy.Data$prov.abbrev <- "BC"
@@ -52,9 +52,9 @@ summary(unemploy_didreg)
 unemploy_didreg1 = glm(unemploy_rate ~ treated_prov*treated_year, data = Unemploy.Data)
 summary(unemploy_didreg1)
 
-#large province DiD
-unemploy_data_2 <- read.csv("new_unemploy_slim.csv", stringsAsFactors=F)
-unemploy_data_2$treated_year = ifelse(unemploy_data_2$Reference.period >=2001  & unemploy_data_2$Reference.period <=2008, 1, 0)
+# large province DiD
+unemploy_data_2 <- read.csv("unemploy_slim.csv", stringsAsFactors=F)
+unemploy_data_2$treated_year = ifelse(unemploy_data_2$Reference.period >=2001 & unemploy_data_2$Reference.period <=2008, 1, 0)
 unemploy_data_2$treated_prov = ifelse(unemploy_data_2$geo_code == 59, 1, 0)
 unemploy_data_2$interaction = unemploy_data_2$treated_year * unemploy_data_2$treated_prov
 
