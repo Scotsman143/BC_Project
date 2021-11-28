@@ -44,13 +44,35 @@ Unemploy.Data$prov.abbrev <- ifelse(Unemploy.Data$geo_code == 62, "NU", Unemploy
 Unemploy.Data$treated_year = ifelse(Unemploy.Data$Reference.period >=2001 & Unemploy.Data$Reference.period <=2008, 1, 0)
 Unemploy.Data$treated_prov = ifelse(Unemploy.Data$prov.abbrev == "BC", 1, 0)
 Unemploy.Data$interaction = Unemploy.Data$treated_year * Unemploy.Data$treated_prov
+Unemploy.Data$year <- factor(Unemploy.Data$Reference.period)
 
 # did estimator
-unemploy_didreg = glm(unemploy_rate ~ treated_prov + treated_year, data = Unemploy.Data)
+unemploy_didreg = lm(unemploy_rate ~ treated_prov + treated_year, data = Unemploy.Data)
 summary(unemploy_didreg)
 
-unemploy_didreg1 = glm(unemploy_rate ~ treated_prov*treated_year, data = Unemploy.Data)
+# did with no fixed effect
+unemploy_didreg1 = lm(unemploy_rate ~ treated_prov*treated_year, data = Unemploy.Data)
 summary(unemploy_didreg1)
+
+# did w/prov fixed effect
+unemploy_didreg_prov = lm(unemploy_rate ~ treated_prov*treated_year + prov.abbrev, data = Unemploy.Data)
+summary(unemploy_didreg_prov)
+
+# did w/year fixed effect
+unemploy_didreg_year = lm(unemploy_rate ~ treated_prov*treated_year + year-1, data = Unemploy.Data)
+summary(unemploy_didreg_year)
+
+# did w/industry fixed effect
+unemploy_didreg_industry = lm(unemploy_rate ~ treated_prov*treated_year + industry, data = Unemploy.Data)
+summary(unemploy_didreg_industry)
+
+# did w/industry-by-year fixed effect
+unemploy_didreg_industry_year = lm(unemploy_rate ~ treated_prov*treated_year + industry*year-1, data = Unemploy.Data)
+summary(unemploy_didreg_industry_year)
+
+# did w/year, industry, prov fixed effects
+unemploy_didreg_all = lm(unemploy_rate ~ treated_prov*treated_year + industry + prov.abbrev + year-1, data = Unemploy.Data)
+summary(unemploy_didreg_all)
 
 # large province DiD
 unemploy_data_2 <- read.csv("unemploy_slim.csv", stringsAsFactors=F)
