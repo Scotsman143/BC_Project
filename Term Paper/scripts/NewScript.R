@@ -7,19 +7,16 @@
 ##########################################################################################
 library(plyr)
 library(reshape2)
-library(ggplot2)
 library(glmnet)
-
+library(memisc)
 ##########################################################################################
 # Set working directory and import data
 ##########################################################################################
-datadir <- "C:/Users/lukea/Documents/GitHub/BC_Project/Term Paper/data/use_data"
+datadir <- "C:/directory"
 setwd(datadir)
-
 ##########################################################################################
 # Unemployment
 ##########################################################################################
-
 # bring in unemployment data
 Unemploy.Data <- read.csv("unemploy.csv", stringsAsFactors=F)
 
@@ -39,7 +36,6 @@ Unemploy.Data$prov.abbrev <- ifelse(Unemploy.Data$geo_code == 60, "YT", Unemploy
 Unemploy.Data$prov.abbrev <- ifelse(Unemploy.Data$geo_code == 61, "NT", Unemploy.Data$prov.abbrev)
 Unemploy.Data$prov.abbrev <- ifelse(Unemploy.Data$geo_code == 62, "NU", Unemploy.Data$prov.abbrev)
 
-
 # dummmy and interaction variables
 Unemploy.Data$treated_year = ifelse(Unemploy.Data$Reference.period >=2001 & Unemploy.Data$Reference.period <=2008, 1, 0)
 Unemploy.Data$treated_prov = ifelse(Unemploy.Data$prov.abbrev == "BC", 1, 0)
@@ -48,49 +44,52 @@ Unemploy.Data$year <- factor(Unemploy.Data$Reference.period)
 
 # did estimator
 unemploy_didreg = lm(unemploy_rate ~ treated_prov + treated_year, data = Unemploy.Data)
-summary(unemploy_didreg)
 
 # did with no fixed effect
 unemploy_didreg1 = lm(unemploy_rate ~ treated_prov*treated_year, data = Unemploy.Data)
-summary(unemploy_didreg1)
 
 # did w/prov fixed effect
 unemploy_didreg_prov = lm(unemploy_rate ~ treated_prov*treated_year + prov.abbrev, data = Unemploy.Data)
-summary(unemploy_didreg_prov)
 
 # did w/year fixed effect
-unemploy_didreg_year = lm(unemploy_rate ~ treated_prov*treated_year + year-1, data = Unemploy.Data)
-summary(unemploy_didreg_year)
+unemploy_didreg_year = lm(unemploy_rate ~ treated_prov*treated_year + year, data = Unemploy.Data)
 
 # did w/industry fixed effect
 unemploy_didreg_industry = lm(unemploy_rate ~ treated_prov*treated_year + industry, data = Unemploy.Data)
-summary(unemploy_didreg_industry)
 
 # did w/industry-by-year fixed effect
-unemploy_didreg_industry_year = lm(unemploy_rate ~ treated_prov*treated_year + industry*year-1, data = Unemploy.Data)
+unemploy_didreg_industry_year = lm(unemploy_rate ~ treated_prov*treated_year + industry*year, data = Unemploy.Data)
+
 summary(unemploy_didreg_industry_year)
 
 # did w/year, industry, prov fixed effects
-unemploy_didreg_all = lm(unemploy_rate ~ treated_prov*treated_year + industry + prov.abbrev + year-1, data = Unemploy.Data)
-summary(unemploy_didreg_all)
+unemploy_didreg_all = lm(unemploy_rate ~ treated_prov*treated_year + prov.abbrev + year + industry, data = Unemploy.Data)
 
 # large province DiD
-unemploy_data_2 <- read.csv("unemploy_slim.csv", stringsAsFactors=F)
-unemploy_data_2$treated_year = ifelse(unemploy_data_2$Reference.period >=2001 & unemploy_data_2$Reference.period <=2008, 1, 0)
-unemploy_data_2$treated_prov = ifelse(unemploy_data_2$geo_code == 59, 1, 0)
-unemploy_data_2$interaction = unemploy_data_2$treated_year * unemploy_data_2$treated_prov
+#unemploy_data_2 <- read.csv("unemploy_slim.csv", stringsAsFactors=F)
+#unemploy_data_2$treated_year = ifelse(unemploy_data_2$Reference.period >=2001 & unemploy_data_2$Reference.period <=2008, 1, 0)
+#unemploy_data_2$treated_prov = ifelse(unemploy_data_2$geo_code == 59, 1, 0)
+#unemploy_data_2$interaction = unemploy_data_2$treated_year * unemploy_data_2$treated_prov
 
 # large province did estimator
-unemploy_didreg_2 = glm(unemploy_rate ~ treated_prov + treated_year, data = unemploy_data_2)
-summary(unemploy_didreg_2)
+#unemploy_didreg_2 = glm(unemploy_rate ~ treated_prov + treated_year, data = unemploy_data_2)
+#summ(unemploy_didreg_2)
 
-unemploy_didreg1_2 = glm(unemploy_rate ~ treated_prov*treated_year, data = unemploy_data_2)
-summary(unemploy_didreg1_2)
+#unemploy_didreg1_2 = glm(unemploy_rate ~ treated_prov*treated_year, data = unemploy_data_2)
+#summ(unemploy_didreg1_2)
+
+##########################################################################################
+# Collect and export results
+##########################################################################################
+unemploy_latex <- ("C:/directory/unemploy_latex.tex")
+
+unemploy_models <- mtable("Model 1" = unemploy_didreg1, "Model 2" = unemploy_didreg_prov,  "Model 3" = unemploy_didreg_year, "Model 4" = unemploy_didreg_industry, "Model 5" = unemploy_didreg_all)
+
+write.mtable(unemploy_models, forLaTeX=TRUE, unemploy_latex)
 
 ##########################################################################################
 # Wages
 ##########################################################################################
-
 # bring in wage data
 Wages.Data <- read.csv("wages.csv", stringsAsFactors=F)
 
@@ -116,9 +115,31 @@ Wages.Data$treated_prov = ifelse(Wages.Data$prov.abbrev == "BC", 1, 0)
 Wages.Data$interaction = Wages.Data$treated_year * Wages.Data$treated_prov
 
 # did estimator
-wage_didreg = glm(avg_hr_wage ~ treated_prov + treated_year, data = Wages.Data)
-summary(wage_didreg)
+wage_didreg = lm(avg_hr_wage ~ treated_prov + treated_year, data = Wages.Data)
 
-wage_didreg1 = glm(avg_hr_wage ~ treated_prov*treated_year, data = Wages.Data)
-summary(wage_didreg1)
+# did with no fixed effect
+wage_didreg1 = lm(avg_hr_wage ~ treated_prov*treated_year, data = Wages.Data)
 
+# did w/prov fixed effect
+wage_didreg_prov = lm(avg_hr_wage ~ treated_prov*treated_year + as.factor(prov.abbrev), data = Wages.Data)
+
+# did w/year fixed effect
+wage_didreg_year = lm(avg_hr_wage ~ treated_prov*treated_year + as.factor(year), data = Wages.Data)
+
+# did w/industry fixed effect
+wage_didreg_industry = lm(avg_hr_wage ~ treated_prov*treated_year + industry, data = Wages.Data)
+
+# did w/industry-by-year fixed effect
+wage_didreg_industry_year = lm(avg_hr_wage ~ treated_prov*treated_year + industry*year, data = Wages.Data)
+
+# did w/year, industry, prov fixed effects
+wage_didreg_all = lm(avg_hr_wage ~ treated_prov*treated_year + industry + prov.abbrev + year, data = Wages.Data)
+
+##########################################################################################
+# Collect and export results
+##########################################################################################
+wages_latex <- ("C:/directory/wages_latex.tex")
+
+wages_models <- mtable("Model 1" = wage_didreg1, "Model 2" = wage_didreg_prov,  "Model 3" = wage_didreg_year, "Model 4" = wage_didreg_industry, "Model 5" = wage_didreg_all)
+
+write.mtable(wages_models, forLaTeX=TRUE, file=wages_latex)
