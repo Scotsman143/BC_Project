@@ -12,7 +12,7 @@ library(memisc)
 ##########################################################################################
 # Set working directory and import data
 ##########################################################################################
-datadir <- "C:/directory"
+datadir <- "C:/Users/lukea/Documents/GitHub/BC_Project/Term Paper/data/use_data"
 setwd(datadir)
 ##########################################################################################
 # Unemployment
@@ -113,6 +113,7 @@ Wages.Data$prov.abbrev <- ifelse(Wages.Data$geo_code == 62, "NU", Wages.Data$pro
 Wages.Data$treated_year = ifelse(Wages.Data$Reference.period >= 2001 & Wages.Data$Reference.period <=2008, 1, 0)
 Wages.Data$treated_prov = ifelse(Wages.Data$prov.abbrev == "BC", 1, 0)
 Wages.Data$interaction = Wages.Data$treated_year * Wages.Data$treated_prov
+Wages.Data$year <- factor(Wages.Data$Reference.period)
 
 # did estimator
 wage_didreg = lm(avg_hr_wage ~ treated_prov + treated_year, data = Wages.Data)
@@ -121,10 +122,10 @@ wage_didreg = lm(avg_hr_wage ~ treated_prov + treated_year, data = Wages.Data)
 wage_didreg1 = lm(avg_hr_wage ~ treated_prov*treated_year, data = Wages.Data)
 
 # did w/prov fixed effect
-wage_didreg_prov = lm(avg_hr_wage ~ treated_prov*treated_year + as.factor(prov.abbrev), data = Wages.Data)
+wage_didreg_prov = lm(avg_hr_wage ~ treated_prov*treated_year + prov.abbrev, data = Wages.Data)
 
 # did w/year fixed effect
-wage_didreg_year = lm(avg_hr_wage ~ treated_prov*treated_year + as.factor(year), data = Wages.Data)
+wage_didreg_year = lm(avg_hr_wage ~ treated_prov*treated_year + year, data = Wages.Data)
 
 # did w/industry fixed effect
 wage_didreg_industry = lm(avg_hr_wage ~ treated_prov*treated_year + industry, data = Wages.Data)
