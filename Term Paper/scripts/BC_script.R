@@ -2,7 +2,7 @@
 #Author: Luke Ashton
 #Github_Tag: Scotsman143
 #Date: November 23, 2021
-#Last_Updated: November 24, 2021
+#Last_Updated: December 12, 2021
 #Github_Repo: https://github.com/Scotsman143/BC_Project
 ##########################################################################################
 library(plyr)
@@ -12,7 +12,7 @@ library(memisc)
 ##########################################################################################
 # Set working directory and import data
 ##########################################################################################
-datadir <- "C:/Users/lukea/Documents/GitHub/BC_Project/Term Paper/data/use_data"
+datadir <- "C:/use_data"
 setwd(datadir)
 ##########################################################################################
 # Unemployment
